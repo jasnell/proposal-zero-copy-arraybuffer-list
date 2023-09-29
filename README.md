@@ -133,7 +133,7 @@ This would be an new alternative to `arrayBuffer.slice(...)` that returns a view
 
 ### `SharedArrayBuffer.of(sharedArrayBuffers...) : SharedArrayBuffer`
 
-The equivalent of `ArrayBuffer.of(...)` but specifically for `SharedArrayBuffer`. All of the arguments given must be `SharedArrayBuffer` instances. Effectively the same zero-copy characteristics.
+The equivalent of `ArrayBuffer.of(...)` but specifically for `SharedArrayBuffer`. All of the arguments given must be non-growable `SharedArrayBuffer` instances. Effectively the same zero-copy characteristics.
 
 ### `SharedArrayBuffer.subarray(...) : SharedArrayBuffer`
 
