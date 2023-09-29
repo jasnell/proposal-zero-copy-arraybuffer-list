@@ -31,14 +31,14 @@ Here we propose a similar language level mechanism that would allow an `ArrayBuf
 const ab1 = new ArrayBuffer(10);
 const ab2 = new ArrayBuffer(10);
 
-const combined = ArrayBuffer.of([ab1, ab2]);
+const combined = ArrayBuffer.of(ab1, ab2);
 
 console.log(combined instanceof ArrayBuffer);  // true
 console.log(combined.byteLength); // 20
 
 const u8 = new Uint8Array(combined);
 
-const combined2 = ArrayBuffer.of([combined, new ArrayBuffer(20)]);
+const combined2 = ArrayBuffer.of(combined, new ArrayBuffer(20));
 console.log(combined2.byteLength); // 30
 
 // importantly, the original source ArrayBuffers are still usable
@@ -105,16 +105,15 @@ while (true) {
 await writer.close();
 ```
 
-### `ArrayBuffer.of(arrayOfArrayBuffers) : ArrayBuffer`
+### `ArrayBuffer.of(arrayBuffers...) : ArrayBuffer`
 
 Returns an `ArrayBuffer` that is a zero-copy concatenation of the given array of `ArrayBuffer`s.
 
 The method will throw if:
 
-* The `arrayOfArrayBuffers` is not actually an array
-* Any of the members of the `arrayOfArrayBuffers` array is not an `ArrayBuffer`
-* Any of the member `ArrayBuffer` instances are resizable
-* Any of the member `ArrayBuffer` instances are detached (zero-length `ArrayBuffers` are acceptable)
+* Any of the arguments is not an `ArrayBuffer`
+* Any of the argument `ArrayBuffer`s are resizable
+* Any of the argument `ArrayBuffer`s are detached (zero-length `ArrayBuffers` are acceptable)
 
 ### `arrayBuffer.slice(...) : ArrayBuffer`
 
@@ -133,6 +132,28 @@ Will always be `false` for these `ArrayBuffer` instances. They will never be res
 This would be an new alternative to `arrayBuffer.slice(...)` that returns a view over the current `ArrayBuffer` without copying. This is added to better support the zero-copy use case. Such `ArrayBuffer`s become detached when their source `ArrayBuffer`s are detached.
 
 ## Questions
+
+### Does `arrayBuffer.subarray` belong here?
+
+Many users may not know that `arrayBuffer.slice()` actually copies the data. To better support the zero-copy use case, and to avoid unintended footguns, `arrayBuffer.subarray(...)` is introduced here. That said, an argument could be made that it is out of place in this proposal. Should it remain? Should it be removed?
+
+An example of intended use:
+
+```js
+const ab1 = new ArrayBuffer(100);
+const ab2 = new ArrayBuffer(10);
+const u8 = new Uint8Array(ab1, 0, 10);
+
+const combined = ArrayBuffer.of(u8.buffer.subarray(u8.byteOffset, u8.byteLength), ab2);
+```
+
+Alternatively, `transfer(length)` could be used,
+
+```
+const combined = ArrayBuffer.of(u8.buffer.transfer(10), ab2);
+```
+
+But `arrayBuffer.subarray(...)` provides the ability to create an offset view without additional tricks or copies.
 
 ### What about the host view of such objects?
 
