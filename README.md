@@ -139,6 +139,10 @@ The equivalent of `ArrayBuffer.of(...)` but specifically for `SharedArrayBuffer`
 
 The equivalent of `arrayBuffer.subarray(...)` but specifically for `SharedArrayBuffer`.
 
+### `sharedArrayBuffer.growable : boolean`
+
+Will always be `false` for these `SharedArrayBuffer` instances. They will never be growable, and the source `SharedArrayBuffer` instances are not growable.
+
 ## Questions
 
 ### Do `arrayBuffer.subarray(...)` / `sharedArrayBuffer.subarray(...)` belong here?
