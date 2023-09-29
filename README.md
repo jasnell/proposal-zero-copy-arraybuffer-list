@@ -111,7 +111,7 @@ Returns an `ArrayBuffer` that is a zero-copy concatenation of the given array of
 
 The method will throw if:
 
-* Any of the arguments is not an `ArrayBuffer`
+* Any of the arguments is not an `ArrayBuffer` or `SharedArrayBuffer`
 * Any of the argument `ArrayBuffer`s are resizable
 * Any of the argument `ArrayBuffer`s are detached (zero-length `ArrayBuffers` are acceptable)
 
@@ -131,9 +131,17 @@ Will always be `false` for these `ArrayBuffer` instances. They will never be res
 
 This would be an new alternative to `arrayBuffer.slice(...)` that returns a view over the current `ArrayBuffer` without copying. This is added to better support the zero-copy use case. Such `ArrayBuffer`s become detached when their source `ArrayBuffer`s are detached.
 
+### `SharedArrayBuffer.of(sharedArrayBuffers...) : SharedArrayBuffer`
+
+The equivalent of `ArrayBuffer.of(...)` but specifically for `SharedArrayBuffer`. All of the arguments given must be `SharedArrayBuffer` instances. Effectively the same zero-copy characteristics.
+
+### `SharedArrayBuffer.subarray(...) : SharedArrayBuffer
+
+The equivalent of `arrayBuffer.subarray(...)` but specifically for `SharedArrayBuffer`.
+
 ## Questions
 
-### Does `arrayBuffer.subarray` belong here?
+### Do `arrayBuffer.subarray(...)` / `sharedArrayBuffer.subarray(...)` belong here?
 
 Many users may not know that `arrayBuffer.slice()` actually copies the data. To better support the zero-copy use case, and to avoid unintended footguns, `arrayBuffer.subarray(...)` is introduced here. That said, an argument could be made that it is out of place in this proposal. Should it remain? Should it be removed?
 
