@@ -181,3 +181,16 @@ if (value->IsArrayBufferList()) {
   v8::Local<v8::ArrayBuffer> ab = abl->ToArrayBuffer();  // copies and flattens
 }
 ```
+
+### Something to consider separately: `arrayBuffer.transferAsShared(...)`
+
+One thing about `SharedArrayBuffer` that came up as part of the consideration for this, but somewhat unrelated to the zero-copy use case, is how to go from an `ArrayBuffer` to a `SharedArrayBuffer`. As a separate proposal we might consider if an `arrayBuffer.transferAsShared(...)` would be generally useful.
+
+```js
+const ab = new ArrayBuffer(10);
+const sab = ab.transferAsShared();
+ab.detached; // true
+```
+
+Noting this here only so it's not forgotten.
+
