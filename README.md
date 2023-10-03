@@ -23,6 +23,10 @@ The `BufferList` ([bl](https://www.npmjs.com/package/bl)) module on npm is downl
 
 Its key benefit is performant zero-copy concatenation of `Buffer` instances that can be collectively used as if they were a single `Buffer`, which provides a massive performance improvement by avoiding copies.
 
+Unfortunately, however, while `BufferList` in the bl module implements the basic `Buffer` API, it is not usable as a `Uint8Array` the way Node.js `Buffer` is. This makes it a bit difficult to use effectively in scenarios where we need an `ArrayBuffer` or `TypedArray`.
+
+What we want is the ability to create an `ArrayBuffer` that is a concatenation of one or more other `ArrayBuffer` instances without the need to copy, and with the ability to wrap a `TypedArray` around it.
+
 ## Proposal
 
 Here we propose a similar language level mechanism that would allow an `ArrayBuffer` to be composed to multiple source `ArrayBuffer` instances, without copying, that can be still be used just like any other type of `ArrayBuffer` (at least at the JavaScript level)
@@ -38,8 +42,10 @@ console.log(combined.byteLength); // 20
 
 const u8 = new Uint8Array(combined);
 
-const combined2 = ArrayBuffer.of(combined, new ArrayBuffer(20));
+const ab3 = new ArrayBuffer(20);
+const combined2 = ArrayBuffer.of(combined, ab3); // ab1, ab2, and ab3
 console.log(combined2.byteLength); // 30
+const combinedu8 = new Uint8Array(combined3);  // works!
 
 // importantly, the original source ArrayBuffers are still usable
 const view1 = new Uint8Array(ab1);  // still works
@@ -104,6 +110,8 @@ while (true) {
 }
 await writer.close();
 ```
+
+WHATWG streams do not currently have any built in mechanism similar to the Node.js streams `writev(...)` that allows multiple chunks to be buffered and written as one unit. While a `WritableStream` can be implemented specifically to assume that the `chunk` written is an array, it is difficult to retroactively update existing `WritableStream` implementations to support such a construction. The `ArrayBuffer.of(...)` mechanism would, at least for `WritableStream` instances that support bytes, provide an equivalent mechanism without the need to modify existing implementations of the streams API, as illustrated in the example above.
 
 ### `ArrayBuffer.of(arrayBuffers...) : ArrayBuffer`
 
