@@ -139,6 +139,18 @@ Will always be `false` for these `ArrayBuffer` instances. They will never be res
 
 This would be an new alternative to `arrayBuffer.slice(...)` that returns a view over the current `ArrayBuffer` without copying. This is added to better support the zero-copy use case. Such `ArrayBuffer`s become detached when their source `ArrayBuffer`s are detached.
 
+As an example of how this new method would be useful, consider an example where I have two `TypedArrays` that I want to zero-copy concatenate, taking the appropriate `byteOffset` and `byteLength` into consideration:
+
+```js
+const u8 = new Uint8Array(100);
+const u8a = u8.subarray(0, 10);  // take a view of the first 10 bytes
+const u8b = u8.subarray(90, 100); // take a view of the last 10 bytes
+
+// Now create a concatenation of those two ranges...
+const combined = ArrayBuffer.of(u8a.buffer.subarray(u8a.byteOffset, u8a.byteLength),
+                                u8b.buffer.subarray(u8b.byteOffset, u8b.byteLength));
+```
+
 ### `SharedArrayBuffer.of(sharedArrayBuffers...) : SharedArrayBuffer`
 
 The equivalent of `ArrayBuffer.of(...)` but specifically for `SharedArrayBuffer`. All of the arguments given must be non-growable `SharedArrayBuffer` instances. Effectively the same zero-copy characteristics.
