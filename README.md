@@ -45,7 +45,7 @@ const u8 = new Uint8Array(combined);
 const ab3 = new ArrayBuffer(20);
 const combined2 = ArrayBuffer.of(combined, ab3); // ab1, ab2, and ab3
 console.log(combined2.byteLength); // 30
-const combinedu8 = new Uint8Array(combined3);  // works!
+const combinedu8 = new Uint8Array(combined2);  // works!
 
 // importantly, the original source ArrayBuffers are still usable
 const view1 = new Uint8Array(ab1);  // still works
